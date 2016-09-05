@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#d00000"
+    tools:context="com.doube.waveline.MainActivity">
+
+    <com.doube.waveline.RecordView
+        android:id="@+id/main_wave"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"/>
+
+
+    <Button
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:text="stop/run"
+        android:onClick="click"
+        android:layout_height="50dp"/>
+
+</RelativeLayout>
