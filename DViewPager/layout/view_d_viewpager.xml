@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/d_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#eee58f"
+        android:padding="4dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/d_viewpager_tv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="标题"
+            android:visibility="gone"
+            android:textSize="15sp"/>
+
+        <LinearLayout
+            android:id="@+id/d_viewpager_dot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal"/>
+
+
+    </LinearLayout>
+
+</RelativeLayout>
