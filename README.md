@@ -14,4 +14,6 @@
 
 功能：自动轮播，指示器，标题
 
+## ClipDrawable
 
+可裁剪的Drawable
