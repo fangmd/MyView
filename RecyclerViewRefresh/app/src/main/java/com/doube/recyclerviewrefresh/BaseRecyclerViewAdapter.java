@@ -4,6 +4,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +13,12 @@ import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 
+import static android.content.ContentValues.TAG;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 /**
- * footer,header
+ * footer,header pullToRefresh
  * <p>
  * Created by double on 2016/10/11.
  */
@@ -112,6 +114,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
 
     public void setFooterView(View footerView) {
         mFooterView = footerView;
+        setRefreshComplete();
         notifyItemInserted(getItemCount());
     }
 
@@ -201,7 +204,6 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     private float endY;
     private float moveY = 0;
     private int lastItem;
-    private int totalCount;
     private int firstVisible;
     private boolean isLoad = false;
     private boolean isTop = true;
@@ -226,8 +228,9 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
             //防止回退文本显示异常
             mRecyclerView.scrollToPosition(0);
 
-            if (getHeaderView().getVisibility() == GONE)
+            if (getHeaderView().getVisibility() == GONE) {
                 getHeaderView().setVisibility(VISIBLE);
+            }
 
             RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) getHeaderView().getLayoutParams();
             params.width = RecyclerView.LayoutParams.MATCH_PARENT;
@@ -303,17 +306,18 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (lastItem == getItemCount() + 1 && newState == RecyclerView.SCROLL_STATE_IDLE && !isLoad) {
+                if (lastItem >= getItemCount() - 2 && newState == RecyclerView.SCROLL_STATE_IDLE && !isLoad) {
                     ViewGroup.LayoutParams params = getFooterView().getLayoutParams();
                     params.width = RecyclerView.LayoutParams.MATCH_PARENT;
                     params.height = RecyclerView.LayoutParams.WRAP_CONTENT;
                     getFooterView().setLayoutParams(params);
-                    getHeaderView().setVisibility(VISIBLE);
-                    recyclerView.smoothScrollToPosition(totalCount);
+                    getFooterView().setVisibility(VISIBLE);
+                    recyclerView.smoothScrollToPosition(getItemCount() - 1);
                     isLoad = true;
                     loadMoreListener.onLoadMore();
                 }
-                if (firstVisible == 0) { // header is on 0
+
+                if (firstVisible <= 1) { // header is on 0
                     isTop = true;
                 } else {
                     isTop = false;
@@ -339,6 +343,8 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
                     lastItem = into[0];
                     firstVisible = firstInto[0];
                 }
+
+                Log.d(TAG, "onScrolled: lastItem:" + lastItem + "firstVisible" + firstVisible);
             }
 
         });
@@ -367,16 +373,19 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
 
 
     public void setLoadMoreComplete() {
+        Log.e(TAG, "setLoadMoreComplete: ");
         RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) getFooterView().getLayoutParams();
         params.width = 0;
         params.height = 0;
         getFooterView().setLayoutParams(params);
         getFooterView().setVisibility(View.GONE);
-        notifyItemChanged(0);
+        notifyItemChanged(getItemCount() - 1);
         isLoad = false;
+        mRecyclerView.scrollToPosition(getItemCount() - 2);
     }
 
     public void setRefreshComplete() {
+        Log.e(TAG, "setRefreshComplete: ");
         RecyclerView.LayoutParams params1 = (RecyclerView.LayoutParams) getHeaderView().getLayoutParams();
         params1.width = RecyclerView.LayoutParams.MATCH_PARENT;
         params1.height = RecyclerView.LayoutParams.WRAP_CONTENT;
@@ -386,6 +395,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
         notifyItemChanged(0);
         isRefreshing = false;
     }
+
 
 
 }

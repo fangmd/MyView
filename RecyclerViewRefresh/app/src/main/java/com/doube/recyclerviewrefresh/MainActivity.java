@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                Toast.makeText(MainActivity.this, "load more", Toast.LENGTH_SHORT).show();
                                 mAdapter.setLoadMoreComplete();
 
                             }
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                Toast.makeText(MainActivity.this, "refresh", Toast.LENGTH_SHORT).show();
                                 mAdapter.setRefreshComplete();
                             }
                         });
@@ -91,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
                 }).start();
             }
         });
+
+
+        mAdapter.setRefreshComplete();
 
 
     }
