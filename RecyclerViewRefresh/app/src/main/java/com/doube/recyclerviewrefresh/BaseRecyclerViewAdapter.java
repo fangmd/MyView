@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 
@@ -29,7 +30,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     public static final int TYPE_FOOTER = 1;
     public static final int TYPE_NORMAL = 2;
 
-    private ArrayList<T> mDatas;
+    private List<T> mDatas;
 
     private View mHeaderView;
     private View mFooterView;
@@ -73,12 +74,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
         onBind(holder, pos, data);
 
         if (mListener != null) {
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mListener.onItemClick(pos, data);
-                }
-            });
+            holder.itemView.setOnClickListener(v -> mListener.onItemClick(pos, data));
         }
 
     }
@@ -106,6 +102,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
     public void setHeaderView(View headerView) {
         mHeaderView = headerView;
         notifyItemInserted(0);
+        setRefreshComplete();
     }
 
     public View getHeaderView() {
@@ -114,23 +111,29 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
 
     public void setFooterView(View footerView) {
         mFooterView = footerView;
-        setRefreshComplete();
         notifyItemInserted(getItemCount());
+        setLoadMoreComplete();
     }
 
     public View getFooterView() {
         return mFooterView;
     }
 
-    public void addAll(ArrayList<T> datas) {
+    public void addAll(List<T> datas) {
+        mDatas.addAll(datas);
+        notifyDataSetChanged();
+    }
+
+    public void clearAddAll(List<T> datas) {
+        mDatas.clear();
         mDatas.addAll(datas);
         notifyDataSetChanged();
     }
 
 
-    class Holder extends RecyclerView.ViewHolder {
+    protected class ViewHolder extends RecyclerView.ViewHolder {
 
-        public Holder(View itemView) {
+        public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
@@ -158,7 +161,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
         mListener = li;
     }
 
-    interface OnItemClickListener<T> {
+    public interface OnItemClickListener<T> {
         void onItemClick(int position, T data);
     }
 
@@ -183,7 +186,6 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
                 }
             });
         }
-
     }
 
     @Override
@@ -242,8 +244,9 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
                 moveY = moveY / 2;
             }
             viewHeight = getHeaderView().getHeight();
-            if (viewHeight <= 0)
+            if (viewHeight <= 0) {
                 viewHeight = 130;
+            }
             moveY = moveY - viewHeight;
             params.setMargins(0, (int) moveY, 0, 0);
             getHeaderView().setLayoutParams(params);
@@ -306,7 +309,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (lastItem >= getItemCount() - 2 && newState == RecyclerView.SCROLL_STATE_IDLE && !isLoad) {
+                if (lastItem >= getItemCount() - 2 && newState == RecyclerView.SCROLL_STATE_IDLE && !isLoad && mRecyclerView.getHeight() >= getScreenHeight()) {
                     ViewGroup.LayoutParams params = getFooterView().getLayoutParams();
                     params.width = RecyclerView.LayoutParams.MATCH_PARENT;
                     params.height = RecyclerView.LayoutParams.WRAP_CONTENT;
@@ -349,26 +352,27 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
 
         });
 
-        mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (isTop) {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            startY = event.getY();
-                            break;
-                        case MotionEvent.ACTION_MOVE:
-                            touchMove(event);
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            touchUp();
-                            break;
-                    }
+        mRecyclerView.setOnTouchListener((v, event) -> {
+            if (isTop) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        startY = event.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        touchMove(event);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        touchUp();
+                        break;
                 }
-                return false;
             }
+            return false;
         });
 
+    }
+
+    private int getScreenHeight() {
+        return mRecyclerView.getContext().getResources().getDisplayMetrics().heightPixels;
     }
 
 
@@ -379,9 +383,10 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
         params.height = 0;
         getFooterView().setLayoutParams(params);
         getFooterView().setVisibility(View.GONE);
-        notifyItemChanged(getItemCount() - 1);
         isLoad = false;
-        mRecyclerView.scrollToPosition(getItemCount() - 2);
+        if (mRecyclerView != null) {
+            mRecyclerView.scrollToPosition(getItemCount() - 2);
+        }
     }
 
     public void setRefreshComplete() {
@@ -392,10 +397,9 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Re
         params1.setMargins(0, -getHeaderView().getHeight(), 0, 0);
         getHeaderView().setLayoutParams(params1);
         getHeaderView().setVisibility(GONE);
-        notifyItemChanged(0);
         isRefreshing = false;
     }
 
 
-
 }
+

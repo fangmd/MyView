@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         mRV.setAdapter(mAdapter);
 
         ArrayList<String> strings = new ArrayList<>();
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 10; i++) {
             strings.add(String.format("haha %s", i));
         }
         mAdapter.addAll(strings);
@@ -38,61 +38,36 @@ public class MainActivity extends AppCompatActivity {
         mAdapter.setFooterView(view2);
 
         //onclick
-        mAdapter.setOnItemClickListener(new BaseRecyclerViewAdapter.OnItemClickListener<String>() {
-            @Override
-            public void onItemClick(int position, String data) {
-                Toast.makeText(MainActivity.this, "" + position, Toast.LENGTH_SHORT).show();
-            }
-        });
+        mAdapter.setOnItemClickListener((position, data) -> Toast.makeText(MainActivity.this, "" + position, Toast.LENGTH_SHORT).show());
 
-        mAdapter.setLoadMoreListener(new BaseRecyclerViewAdapter.LoadMoreListener() {
-            @Override
-            public void onLoadMore() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(MainActivity.this, "load more", Toast.LENGTH_SHORT).show();
-                                mAdapter.setLoadMoreComplete();
-
-                            }
-                        });
+        mAdapter.setLoadMoreListener(() ->
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                }).start();
-            }
-        });
 
-        mAdapter.setPullToRefreshListener(new BaseRecyclerViewAdapter.PullToRefreshListener() {
-            @Override
-            public void onRefreshing() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    runOnUiThread(() -> {
+                        Toast.makeText(MainActivity.this, "load more", Toast.LENGTH_SHORT).show();
+                        mAdapter.setLoadMoreComplete();
 
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(MainActivity.this, "refresh", Toast.LENGTH_SHORT).show();
-                                mAdapter.setRefreshComplete();
-                            }
-                        });
+                    });
+                }).start());
+
+        mAdapter.setPullToRefreshListener(() ->
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                }).start();
-            }
-        });
+
+                    runOnUiThread(() -> {
+                        Toast.makeText(MainActivity.this, "refresh", Toast.LENGTH_SHORT).show();
+                        mAdapter.setRefreshComplete();
+                    });
+                }).start());
 
 
         mAdapter.setRefreshComplete();

@@ -14,10 +14,6 @@ import butterknife.BindView;
 
 public class MyAdapter extends BaseRecyclerViewAdapter<String> {
 
-    public static final int TYPE_HEADER = 0;
-    public static final int TYPE_FOOTER = 1;
-    public static final int TYPE_NORMAL = 2;
-
     @Override
     public RecyclerView.ViewHolder onCreateVH(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
@@ -33,7 +29,7 @@ public class MyAdapter extends BaseRecyclerViewAdapter<String> {
     }
 
 
-    class Holder extends BaseRecyclerViewAdapter.Holder {
+    class Holder extends BaseRecyclerViewAdapter.ViewHolder {
 
         @BindView(R.id.tv_name)
         TextView text;
