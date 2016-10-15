@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         mRV.setAdapter(mAdapter);
 
         ArrayList<String> strings = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             strings.add(String.format("haha %s", i));
         }
         mAdapter.addAll(strings);
@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         mAdapter.setHeaderView(view);
         View view2 = LayoutInflater.from(this).inflate(R.layout.footer, mRV, false);
         mAdapter.setFooterView(view2);
+        mAdapter.setDEBUG(true);
 
         //onclick
         mAdapter.setOnItemClickListener((position, data) -> Toast.makeText(MainActivity.this, "" + position, Toast.LENGTH_SHORT).show());
@@ -65,12 +66,9 @@ public class MainActivity extends AppCompatActivity {
 
                     runOnUiThread(() -> {
                         Toast.makeText(MainActivity.this, "refresh", Toast.LENGTH_SHORT).show();
-                        mAdapter.setRefreshComplete();
+                        mAdapter.setOnRefreshComplete();
                     });
                 }).start());
-
-
-        mAdapter.setRefreshComplete();
 
 
     }
