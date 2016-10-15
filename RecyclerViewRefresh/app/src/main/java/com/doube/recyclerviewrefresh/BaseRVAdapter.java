@@ -39,7 +39,6 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
     private OnItemClickListener mListener;
     private RecyclerView mRecyclerView;
-    private int mFooterHeight;
 
 
     public BaseRVAdapter() {
@@ -231,18 +230,15 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
     private int[] into;
     private int[] firstInto;
-    //    private float startY = 0;
+    //    private float mStartY = 0;
     private float endY;
     private float moveY = 0;
-    private int lastItem;
-    private int firstVisible;
     private boolean isLoad = false;
     private boolean isTop = true;
     private boolean isRefreshing = false;
-    private LoadMoreListener mLoadMoreListener;
-    private PullToRefreshListener mPullToRefreshListener;
     private int viewHeight;
 
+    //------------
     private static final int HEAD_DONE = 0;
     private static final int HEAD_PULL_TO_REFRESH = 1;
     private static final int HEAD_RELEASE_TO_REFRESH = 2;
@@ -253,16 +249,20 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
     private static final int FOOT_LOAD_MORE = 1;
     private static final int FOOT_NO_MORE = 2;
 
+    private LoadMoreListener mLoadMoreListener;
+    private PullToRefreshListener mPullToRefreshListener;
     private int mHeadState;
     private int mFootState;
-
     private TextView mHeadText;
     private TextView mFootText;
-
-    private int mHeaderViewHeight;
-    private float startY;
-    private float offsetY;
     private int mFirstVisibleItem;
+    private int mLastVisibleItem;
+    private int mHeaderViewHeight;
+    private int mFooterHeight;
+
+    private float mStartY;
+    private float mOffsetY;
+
     private boolean isRecord;
     private boolean isEnd;
     /**
@@ -314,7 +314,7 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
                     Log.d(TAG, "onScrollStateChanged: mRecyclerView.getBottom():" + mRecyclerView.getBottom()
                             + "mRecyclerView.getHeight:" + mRecyclerView.getHeight() + "mScreenHeighe:" + getScreenHeight());
 
-                if (lastItem >= getItemCount() - 2 && newState == RecyclerView.SCROLL_STATE_IDLE && !isLoad && mFirstVisibleItem != 0) {
+                if (mLastVisibleItem >= getItemCount() - 2 && newState == RecyclerView.SCROLL_STATE_IDLE && !isLoad && mFirstVisibleItem != 0) {
                     ViewGroup.LayoutParams params = getFooterView().getLayoutParams();
                     params.width = RecyclerView.LayoutParams.MATCH_PARENT;
                     params.height = RecyclerView.LayoutParams.WRAP_CONTENT;
@@ -342,27 +342,28 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
                 super.onScrolled(recyclerView, dx, dy);
                 RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
                 if (layoutManager instanceof LinearLayoutManager) {
-                    lastItem = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
-                    firstVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+                    mLastVisibleItem = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
+                    mFirstVisibleItem = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
                 } else {
                     into = ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(into);
                     firstInto = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstInto);
-                    lastItem = into[0];
-                    firstVisible = firstInto[0];
+                    mLastVisibleItem = into[0];
+                    mFirstVisibleItem = firstInto[0];
                 }
 
                 if (DEBUG)
-                    Log.d(TAG, "onScrolled: lastItem:" + lastItem + "firstVisible" + firstVisible);
+                    Log.d(TAG, "onScrolled: mLastVisibleItem:" + mLastVisibleItem + "firstVisible" + mFirstVisibleItem);
 
-                mFirstVisibleItem = firstVisible;
                 mFirstVisibleItem = mFirstVisibleItem == 1 ? 0 : mFirstVisibleItem;
+                mLastVisibleItem = mLastVisibleItem == getItemCount() - 2 ? getItemCount() - 1 : mLastVisibleItem;
+
             }
 
         });
 
         mRecyclerView.setOnTouchListener((v, event) -> {
             if (isEnd) {//如果现在时结束的状态，即刷新完毕了，可以再次刷新了，在onRefreshComplete中设置,或者onLoadMoreComplete中设置
-                if (mIsRefreshable) {//如果现在是可刷新状态   在setOnMeiTuanListener中设置为true
+                if (mIsRefreshable) {//如果现在是可刷新状态   在setPullToRefreshListener中设置为true
                     switch (event.getAction()) {
                         //用户按下
                         case MotionEvent.ACTION_DOWN:
@@ -371,7 +372,7 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
                                 //将isRecord置为true，说明现在已记录y坐标
                                 isRecord = true;
                                 //将当前y坐标赋值给startY起始y坐标
-                                startY = event.getY();
+                                mStartY = event.getY();
                             }
                             break;
                         //用户滑动
@@ -381,14 +382,14 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
                             //再起判断一下是否为listview顶部并且没有记录y坐标
                             if (mFirstVisibleItem == 0 && !isRecord) {
                                 isRecord = true;
-                                startY = tempY;
+                                mStartY = tempY;
                             }
                             //如果当前状态不是正在刷新的状态，并且已经记录了y坐标
                             if (mHeadState != HEAD_REFRESHING && isRecord) {
                                 //计算y的偏移量
-                                offsetY = tempY - startY;
+                                mOffsetY = tempY - mStartY;
                                 //计算当前滑动的高度
-                                float currentHeight = (-mHeaderViewHeight + offsetY / 3);
+                                float currentHeight = (-mHeaderViewHeight + mOffsetY / 3);
                                 //用当前滑动的高度和头部headerView的总高度进行比 计算出当前滑动的百分比 0到1
                                 float currentProgress = 1 + currentHeight / mHeaderViewHeight;
                                 //如果当前百分比大于1了，将其设置为1，目的是让第一个状态的椭圆不再继续变大
@@ -396,75 +397,68 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
                                     currentProgress = 1;
                                 }
 
-                                //如果当前的状态是放开刷新，并且已经记录y坐标
-                                if (mHeadState == HEAD_RELEASE_TO_REFRESH && isRecord) {
-                                    mRecyclerView.smoothScrollToPosition(0);
-                                    //如果当前滑动的距离小于headerView的总高度
-                                    if (-mHeaderViewHeight + offsetY / HEAD_RATIO < 0) {
-                                        //将状态置为下拉刷新状态
-                                        mHeadState = HEAD_PULL_TO_REFRESH;
-                                        //根据状态改变headerView，主要是更新动画和文字等信息
-                                        changeHeaderByState(mHeadState);
-                                        //如果当前y的位移值小于0，即为headerView隐藏了
-                                    } else if (offsetY <= 0) {
-                                        //将状态变为done
-                                        mHeadState = HEAD_DONE;
-                                        //根据状态改变headerView，主要是更新动画和文字等信息
-                                        changeHeaderByState(mHeadState);
-                                    }
-                                }
+                                switch (mHeadState) {
+                                    //如果当前状态为done并且已经记录y坐标
+                                    case HEAD_DONE:
+                                        //如果位移值大于0
+                                        if (mOffsetY >= 0) {
+                                            //将状态改为下拉刷新状态
+                                            mHeadState = HEAD_PULL_TO_REFRESH;
+                                        }
+                                        break;
 
-                                //如果当前状态为下拉刷新并且已经记录y坐标
-                                if (mHeadState == HEAD_PULL_TO_REFRESH && isRecord) {
-                                    mRecyclerView.smoothScrollToPosition(0);
-                                    //如果下拉距离大于等于headerView的总高度
-                                    if (-mHeaderViewHeight + offsetY / HEAD_RATIO >= 0) {
-                                        //将状态变为放开刷新
-                                        mHeadState = HEAD_RELEASE_TO_REFRESH;
-                                        //根据状态改变headerView，主要是更新动画和文字等信息
-                                        changeHeaderByState(mHeadState);
-                                        //如果当前y的位移值小于0，即为headerView隐藏了
-                                    } else if (offsetY <= 0) {
-                                        //将状态变为done
-                                        mHeadState = HEAD_DONE;
-                                        //根据状态改变headerView，主要是更新动画和文字等信息
-                                        changeHeaderByState(mHeadState);
-                                    }
-                                }
 
-                                //如果当前状态为done并且已经记录y坐标
-                                if (mHeadState == HEAD_DONE && isRecord) {
-                                    //如果位移值大于0
-                                    if (offsetY >= 0) {
-                                        //将状态改为下拉刷新状态
-                                        mHeadState = HEAD_PULL_TO_REFRESH;
-                                    }
-                                }
+                                    //如果当前状态为下拉刷新并且已经记录y坐标
+                                    case HEAD_PULL_TO_REFRESH:
+                                        mRecyclerView.smoothScrollToPosition(0);
+                                        //如果下拉距离大于等于headerView的总高度
+                                        if (-mHeaderViewHeight + mOffsetY / HEAD_RATIO >= 0) {
+                                            //将状态变为放开刷新
+                                            mHeadState = HEAD_RELEASE_TO_REFRESH;
+                                            //根据状态改变headerView，主要是更新动画和文字等信息
+                                            changeHeaderByState(mHeadState);
+                                            //如果当前y的位移值小于0，即为headerView隐藏了
+                                        } else if (mOffsetY <= 0) {
+                                            //将状态变为done
+                                            mHeadState = HEAD_DONE;
+                                            //根据状态改变headerView，主要是更新动画和文字等信息
+                                            changeHeaderByState(mHeadState);
+                                        }
 
-                                //如果为下拉刷新状态
-                                if (mHeadState == HEAD_PULL_TO_REFRESH) {
-                                    //则改变headerView的padding来实现下拉的效果
-                                    RecyclerView.LayoutParams params1 = (RecyclerView.LayoutParams) getHeaderView().getLayoutParams();
-                                    params1.height = RecyclerView.LayoutParams.WRAP_CONTENT;
-                                    mHeaderView.setLayoutParams(params1);
-                                    mHeaderView.setPadding(0, (int) (-mHeaderViewHeight + offsetY / HEAD_RATIO), 0, 0);
+                                        updateHeadViewHeight();
 
-                                    //给第一个状态的View设置当前进度值
+                                        //给第一个状态的View设置当前进度值
+                                        //mFirstView.setCurrentProgress(currentProgress);
+                                        //重画
+                                        //mFirstView.postInvalidate();
+                                        break;
+
+                                    //如果当前的状态是放开刷新，并且已经记录y坐标
+                                    case HEAD_RELEASE_TO_REFRESH:
+                                        mRecyclerView.smoothScrollToPosition(0);
+                                        //如果当前滑动的距离小于headerView的总高度
+                                        if (-mHeaderViewHeight + mOffsetY / HEAD_RATIO < 0) {
+                                            //将状态置为下拉刷新状态
+                                            mHeadState = HEAD_PULL_TO_REFRESH;
+                                            //根据状态改变headerView，主要是更新动画和文字等信息
+                                            changeHeaderByState(mHeadState);
+                                            //如果当前y的位移值小于0，即为headerView隐藏了
+                                        } else if (mOffsetY <= 0) {
+                                            //将状态变为done
+                                            mHeadState = HEAD_DONE;
+                                            //根据状态改变headerView，主要是更新动画和文字等信息
+                                            changeHeaderByState(mHeadState);
+                                        }
+
+                                        updateHeadViewHeight();
+
+                                        //给第一个状态的View设置当前进度值
 //                                    mFirstView.setCurrentProgress(currentProgress);
-                                    //重画
+                                        //重画
 //                                    mFirstView.postInvalidate();
-                                }
-                                //如果为放开刷新状态
-                                if (mHeadState == HEAD_RELEASE_TO_REFRESH) {
-                                    //改变headerView的padding值
-                                    RecyclerView.LayoutParams params1 = (RecyclerView.LayoutParams) getHeaderView().getLayoutParams();
-                                    params1.height = RecyclerView.LayoutParams.WRAP_CONTENT;
-                                    mHeaderView.setLayoutParams(params1);
-                                    mHeaderView.setPadding(0, (int) (-mHeaderViewHeight + offsetY / HEAD_RATIO), 0, 0);
-                                    //给第一个状态的View设置当前进度值
-//                                    mFirstView.setCurrentProgress(currentProgress);
-                                    //重画
-//                                    mFirstView.postInvalidate();
+                                        break;
+
+
                                 }
                             }
                             break;
@@ -473,14 +467,17 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
                             //如果当前状态为下拉刷新状态
                             if (mHeadState == HEAD_PULL_TO_REFRESH) {
                                 //平滑的隐藏headerView
-                                mRecyclerView.smoothScrollBy((int) (-mHeaderViewHeight + offsetY / HEAD_RATIO) + mHeaderViewHeight, 500);
+                                // 下面的滑动不起作用？？
+//                                mRecyclerView.smoothScrollBy((int) (-mHeaderViewHeight + mOffsetY / HEAD_RATIO) + mHeaderViewHeight, 500);
+//                                mRecyclerView.smoothScrollBy(0, -500);
                                 //根据状态改变headerView
+                                mHeadState = HEAD_DONE;
                                 changeHeaderByState(mHeadState);
                             }
                             //如果当前状态为放开刷新
                             if (mHeadState == HEAD_RELEASE_TO_REFRESH) {
                                 //平滑的滑到正好显示headerView
-                                mRecyclerView.smoothScrollBy((int) (-mHeaderViewHeight + offsetY / HEAD_RATIO), 500);
+//                                mRecyclerView.smoothScrollBy((int) (-mHeaderViewHeight + mOffsetY / HEAD_RATIO), 500);
                                 //将当前状态设置为正在刷新
                                 mHeadState = HEAD_REFRESHING;
                                 //回调接口的onRefresh方法
@@ -499,10 +496,17 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
     }
 
-    private int getScreenHeight() {
-        return mRecyclerView.getContext().getResources().getDisplayMetrics().heightPixels;
+    /**
+     * 根据当前手指滑动的offsetY 重新设置高度
+     * <p>
+     * 改变headerView的padding来实现下拉的效果
+     */
+    private void updateHeadViewHeight() {
+        RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) getHeaderView().getLayoutParams();
+        lp.height = RecyclerView.LayoutParams.WRAP_CONTENT;
+        mHeaderView.setLayoutParams(lp);
+        mHeaderView.setPadding(0, (int) (-mHeaderViewHeight + mOffsetY / HEAD_RATIO), 0, 0);
     }
-
 
     /**
      * 根据状态改变headerView的动画和文字显示
@@ -512,21 +516,17 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
     private void changeHeaderByState(int headState) {
         switch (headState) {
             case HEAD_DONE://如果的隐藏的状态
-                //设置headerView的padding为隐藏
                 RecyclerView.LayoutParams params1 = (RecyclerView.LayoutParams) mHeaderView.getLayoutParams();
                 params1.height = 0;
                 mHeaderView.setLayoutParams(params1);
                 break;
             case HEAD_RELEASE_TO_REFRESH://当前状态为放开刷新
-                //文字显示为放开刷新
                 mHeadText.setText("放开刷新");
                 break;
             case HEAD_PULL_TO_REFRESH://当前状态为下拉刷新
-                //设置文字为下拉刷新
                 mHeadText.setText("下拉刷新");
                 break;
             case HEAD_REFRESHING://当前状态为正在刷新
-                //文字设置为正在刷新
                 mHeadText.setText("正在刷新");
                 break;
             default:
@@ -542,27 +542,19 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
      */
     private void changeFooterByState(int footerState) {
         mFootState = footerState;
+        RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) mFooterView.getLayoutParams();
         switch (footerState) {
             case FOOT_DONE:
-                RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) mFooterView.getLayoutParams();
                 lp.height = 0;
                 mFooterView.setLayoutParams(lp);
-
-
-                //
-//                RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) getFooterView().getLayoutParams();
-//                params.height = 0;
-//                mFooterView.setLayoutParams(params);
-//                mFooterView.setVisibility(View.GONE);
                 isLoad = false;
-//        if (mRecyclerView != null) {
-//            mRecyclerView.scrollToPosition(getItemCount() - 2);
-//        }
                 break;
             case FOOT_LOAD_MORE:
                 mFootText.setText("正在加载....");
                 break;
             case FOOT_NO_MORE:
+                lp.height = RecyclerView.LayoutParams.WRAP_CONTENT;
+                mFooterView.setLayoutParams(lp);
                 mFootText.setText("没有更多了");
                 break;
             default:
@@ -597,5 +589,10 @@ public abstract class BaseRVAdapter<T> extends RecyclerView.Adapter<RecyclerView
     public void setDEBUG(boolean DEBUG) {
         this.DEBUG = DEBUG;
     }
+
+    private int getScreenHeight() {
+        return mRecyclerView.getContext().getResources().getDisplayMetrics().heightPixels;
+    }
+
 }
 

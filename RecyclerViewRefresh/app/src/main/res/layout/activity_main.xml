@@ -13,4 +13,11 @@
         android:layout_width="match_parent"
         app:layoutManager="LinearLayoutManager"
         android:layout_height="wrap_content"/>
+
+
+    <Button
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:onClick="onClick"/>
+
 </RelativeLayout>
