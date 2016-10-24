@@ -18,7 +18,7 @@ package com.doube.wheelview.wheel.widget.adapters;
 
 import android.content.Context;
 
-import com.ywl5320.pickaddress.wheel.widget.views.WheelAdapter;
+import com.doube.wheelview.wheel.widget.views.WheelAdapter;
 
 
 /**

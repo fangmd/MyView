@@ -12,7 +12,7 @@ import butterknife.BindView;
  * Created by double on 2016/10/11.
  */
 
-public class MyAdapter extends BaseRVAdapter<String> {
+public class MyAdapter extends BaseRVAdapterLoadMore<String> {
 
     @Override
     public RecyclerView.ViewHolder onCreateVH(ViewGroup parent, int viewType) {
@@ -29,7 +29,7 @@ public class MyAdapter extends BaseRVAdapter<String> {
     }
 
 
-    class Holder extends BaseRVAdapter.ViewHolder {
+    class Holder extends BaseRVAdapterLoadMore.ViewHolder {
 
         @BindView(R.id.tv_name)
         TextView text;

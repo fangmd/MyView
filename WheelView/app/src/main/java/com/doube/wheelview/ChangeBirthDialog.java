@@ -1,8 +1,5 @@
 package com.doube.wheelview;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -10,10 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.ywl5320.pickaddress.wheel.widget.adapters.AbstractWheelTextAdapter;
-import com.ywl5320.pickaddress.wheel.widget.views.OnWheelChangedListener;
-import com.ywl5320.pickaddress.wheel.widget.views.OnWheelScrollListener;
-import com.ywl5320.pickaddress.wheel.widget.views.WheelView;
+import com.doube.wheelview.wheel.widget.adapters.AbstractWheelTextAdapter;
+import com.doube.wheelview.wheel.widget.views.OnWheelChangedListener;
+import com.doube.wheelview.wheel.widget.views.OnWheelScrollListener;
+import com.doube.wheelview.wheel.widget.views.WheelView;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+
 
 /**
  * 日期选择对话框
@@ -33,9 +34,9 @@ public class ChangeBirthDialog extends Dialog implements View.OnClickListener {
 	private TextView btnSure;
 	private TextView btnCancel;
 
-	private ArrayList<String> arry_years = new ArrayList<String>();
-	private ArrayList<String> arry_months = new ArrayList<String>();
-	private ArrayList<String> arry_days = new ArrayList<String>();
+	private ArrayList<String> arry_years = new ArrayList<>();
+	private ArrayList<String> arry_months = new ArrayList<>();
+	private ArrayList<String> arry_days = new ArrayList<>();
 	private CalendarTextAdapter mYearAdapter;
 	private CalendarTextAdapter mMonthAdapter;
 	private CalendarTextAdapter mDaydapter;

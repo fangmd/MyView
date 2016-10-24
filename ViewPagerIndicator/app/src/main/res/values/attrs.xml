@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="ViewPagerIndicator">
+        <attr name="indicatorSpan" format="reference|integer"/>
+        <attr name="selectedColor" format="reference|color"/>
+        <attr name="normalColor" format="reference|color"/>
+        <attr name="vp_radius_indicator" format="reference|integer"/>
+    </declare-styleable>
+
+</resources>

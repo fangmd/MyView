@@ -1,15 +1,5 @@
 package com.doube.wheelview;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -17,10 +7,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.ywl5320.pickaddress.wheel.widget.adapters.AbstractWheelTextAdapter;
-import com.ywl5320.pickaddress.wheel.widget.views.OnWheelChangedListener;
-import com.ywl5320.pickaddress.wheel.widget.views.OnWheelScrollListener;
-import com.ywl5320.pickaddress.wheel.widget.views.WheelView;
+import com.doube.wheelview.wheel.widget.adapters.AbstractWheelTextAdapter;
+import com.doube.wheelview.wheel.widget.views.OnWheelChangedListener;
+import com.doube.wheelview.wheel.widget.views.OnWheelScrollListener;
+import com.doube.wheelview.wheel.widget.views.WheelView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * 更改封面对话框

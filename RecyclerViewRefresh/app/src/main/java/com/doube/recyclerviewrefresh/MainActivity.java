@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClick(View view) {
-        mRV.smoothScrollBy(0, 500);
+//        mRV.smoothScrollBy(0, 500);
+//        mAdapter.setLoadMoreView();
+
     }
 }
