@@ -1,9 +1,8 @@
 package com.doube.messageview;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorCompat;
-import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -48,58 +47,110 @@ public class MessageView extends FrameLayout {
     }
 
     public void setErrorText(String s, int directory) {
+        TextView newTV;
+        LinearLayout.LayoutParams lp;
         switch (directory) {
             case DIRECTORY.BOTTOM:
-                TextView newTV = ((TextView) LayoutInflater.from(mContext).inflate(R.layout.message_tv_error, null, false));
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, mLastTV.getHeight());
+                newTV = ((TextView) LayoutInflater.from(mContext).inflate(R.layout.message_tv_error, this, false));
+                lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, mLastTV.getHeight());
                 newTV.setLayoutParams(lp);
-                animateRemove(mLastTV, newTV);
+                animateRemoveFromBottom(mLastTV, newTV);
                 break;
+            case DIRECTORY.TOP:
+                newTV = ((TextView) LayoutInflater.from(mContext).inflate(R.layout.message_tv_error, this, false));
+                lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, mLastTV.getHeight());
+                newTV.setLayoutParams(lp);
+                Log.d(TAG, "setErrorText: " + mLastTV.getHeight());
+                newTV.setTranslationY(-mLastTV.getHeight());
+                animateRemoveFromTop(mLastTV, newTV);
+                break;
+
         }
 
     }
 
+    private void animateRemoveFromTop(TextView lastTV, final TextView newTV) {
+        mLLRoot.addView(newTV, 0);
 
-    private void animateRemove(TextView lastTV, final TextView newTV) {
-        Log.d(TAG, "animateRemove: lastTV height:" + lastTV.getHeight() + " newTV height:" + newTV.getHeight());
-        mLLRoot.addView(newTV);
+        Log.d(TAG, "animateRemoveFromTop: " + mLastTV.getHeight());
+        Log.d(TAG, "animateRemoveFromTop: " + lastTV.getHeight() + "::" + lastTV.getTranslationY());
 
-        ViewPropertyAnimatorCompat animate = ViewCompat.animate(lastTV);
-        animate.translationY(-lastTV.getHeight());
-        animate.setDuration(500);
+        ObjectAnimator translateY = ObjectAnimator.ofFloat(lastTV, "translationY", 0, mLastTV.getHeight());
+        translateY.setDuration(500);
 
-        final ViewPropertyAnimatorCompat animate2 = ViewCompat.animate(newTV);
-        animate2.translationY(-lastTV.getHeight());
-        animate2.setDuration(500);
+        ObjectAnimator translateY2 = ObjectAnimator.ofFloat(newTV, "translationY", -mLastTV.getHeight(), 0);
+        translateY2.setDuration(500);
 
-
-        animate.setListener(new ViewPropertyAnimatorListener() {
+        translateY.addListener(new Animator.AnimatorListener() {
             @Override
-            public void onAnimationStart(View view) {
-//                mLLRoot.addView(newTV);
-//                animate2.start();
+            public void onAnimationStart(Animator animation) {
+
             }
 
             @Override
-            public void onAnimationEnd(View view) {
-//                mLLRoot.removeView(mLastTV);
-//                mLastTV = newTV;
+            public void onAnimationEnd(Animator animation) {
+                mLLRoot.removeView(mLastTV);
+                mLastTV = newTV;
+                newTV.setTranslationY(0f);
             }
 
             @Override
-            public void onAnimationCancel(View view) {
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
 
             }
         });
 
+        translateY.start();
+        translateY2.start();
+    }
 
-        animate.start();
 
+    private void animateRemoveFromBottom(TextView lastTV, final TextView newTV) {
+        Log.d(TAG, "animateRemove: lastTV height:" + lastTV.getHeight() + lastTV.hashCode() + " newTV height:" + newTV.getHeight() + newTV.hashCode());
+        mLLRoot.addView(newTV);
 
+        ObjectAnimator translateY = ObjectAnimator.ofFloat(lastTV, "translationY", 0, -lastTV.getHeight());
+        translateY.setDuration(500);
+
+        ObjectAnimator translateY2 = ObjectAnimator.ofFloat(newTV, "translationY", 0, -lastTV.getHeight());
+        translateY2.setDuration(500);
+
+        translateY.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mLLRoot.removeView(mLastTV);
+                mLastTV = newTV;
+                newTV.setTranslationY(0f);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+
+        translateY.start();
+        translateY2.start();
     }
 
 
     public class DIRECTORY {
         public static final int BOTTOM = 0;
+        public static final int TOP = 1;
     }
 }

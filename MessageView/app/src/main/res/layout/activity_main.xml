@@ -15,7 +15,8 @@
     <com.doube.messageview.MessageView
         android:id="@+id/mv_main"
         android:layout_width="match_parent"
-        android:layout_height="30dp"/>
+        android:layout_height="60dp"/>
+
 
 
     <Button
@@ -23,7 +24,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="error message"/>
+        android:text="from top"/>
+
+    <Button
+        android:id="@+id/btn_from_bottom"
+        android:layout_above="@id/btn_message_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="from bottom"/>
 
 
 </RelativeLayout>

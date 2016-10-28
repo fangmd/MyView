@@ -19,12 +19,23 @@ public class MainActivity extends AppCompatActivity {
         btnError.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMV.setErrorText("error from btn", MessageView.DIRECTORY.BOTTOM);
+                mMV.setErrorText("error from btn", MessageView.DIRECTORY.TOP);
+
+//                View viewById = findViewById(R.id.view);
+//                ObjectAnimator translateY = ObjectAnimator.ofFloat(viewById, "translationY" +
+//                        "", 0f, ((float) -viewById.getHeight()));
+//                translateY.setDuration(500);
+//                translateY.start();
             }
         });
 
-
-
+        Button viewById = (Button) findViewById(R.id.btn_from_bottom);
+        viewById.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMV.setErrorText("error from btn", MessageView.DIRECTORY.BOTTOM);
+            }
+        });
 
 
     }
