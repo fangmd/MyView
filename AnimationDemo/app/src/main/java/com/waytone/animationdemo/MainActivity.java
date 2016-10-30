@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         Button mBtnOne = (Button) findViewById(R.id.btn_one);
-        mBtnOne.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, AnimationnOneActivity.class)));
+        mBtnOne.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, TransitionActivity.class)));
 
 
     }

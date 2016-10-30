@@ -20,7 +20,7 @@
             android:label="@string/title_activity_animation_one"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".AnimationnOneActivity">
+        <activity android:name=".TransitionActivity">
         </activity>
     </application>
 
