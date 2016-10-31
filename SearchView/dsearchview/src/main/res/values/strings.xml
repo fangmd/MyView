@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">SearchView</string>
+    <string name="search_view_search_user">搜索用户</string>
+</resources>

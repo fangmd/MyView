@@ -1,0 +1,11 @@
+<resources>
+
+
+    <style name="search_view_et" parent="Base.V7.Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/search_view_text_color</item>
+        <item name="android:textCursorDrawable">@color/search_view_cursor_color</item>
+    </style>
+
+
+
+</resources>
