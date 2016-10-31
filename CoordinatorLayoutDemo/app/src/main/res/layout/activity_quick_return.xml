@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.adouble.coordinatorlayoutdemo.QuickReturnActivity">
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Hello World!"
+        app:layoutManager="LinearLayoutManager"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:text="Quick Return"
+        app:layout_behavior="com.adouble.coordinatorlayoutdemo.QuickReturnFooterBehavior"/>
+
+
+</android.support.design.widget.CoordinatorLayout>

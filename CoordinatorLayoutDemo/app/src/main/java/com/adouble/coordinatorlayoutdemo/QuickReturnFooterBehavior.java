@@ -91,6 +91,8 @@ public class QuickReturnFooterBehavior extends CoordinatorLayout.Behavior<View> 
 
     private void show(final View view) {
         mIsShowing = true;
+
+
         ViewPropertyAnimator animator = view.animate()
                 .translationY(0)
                 .setInterpolator(INTERPOLATOR)
