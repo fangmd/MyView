@@ -2,6 +2,7 @@
 <resources>
 
     <declare-styleable name="SwitchView">
-        <attr name="bg_color" format="color"/>
+        <attr name="sv_bg_color" format="color"/>
+        <attr name="sv_circle_color" format="color"/>
     </declare-styleable>
 </resources>

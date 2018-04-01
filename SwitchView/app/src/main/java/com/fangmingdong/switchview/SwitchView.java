@@ -2,6 +2,7 @@ package com.fangmingdong.switchview;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
@@ -67,13 +68,22 @@ public class SwitchView extends View {
     public SwitchView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        handlerAttr(attrs);
+        handlerAttr(context, attrs);
 
         initPaint();
     }
 
-    private void handlerAttr(AttributeSet attrs) {
+    private void handlerAttr(Context context, AttributeSet attrs) {
 
+        if (attrs == null) {
+            return;
+        }
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SwitchView);
+        mBgColor = a.getColor(R.styleable.SwitchView_sv_bg_color, DEFAULT_BG_COLOR);
+        mCircleColor = a.getColor(R.styleable.SwitchView_sv_circle_color, DEFAULT_CIRCLE_COLOR);
+
+        a.recycle();
     }
 
     private void initPaint() {
