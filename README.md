@@ -17,3 +17,9 @@
 ## ClipDrawable
 
 可裁剪的Drawable
+
+## SwitchView 
+
+自定义 View
+
+关键点：触摸处理，属性动画，绘制, 触摸和点击冲突处理, 快速滑动处理（VelocityTracker，ViewConfiguration）
