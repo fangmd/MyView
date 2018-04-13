@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="UploadProgressView">
+        <!--上传中文字颜色-->
+        <attr name="upload_progress_view_text_color" format="color"/>
+        <!--文字字体大小-->
+        <attr name="upload_progress_view_text_size" format="dimension"/>
+        <!--背景颜色-->
+        <attr name="upload_progress_view_bg" format="color"/>
+        <!--上传中 文字-->
+        <attr name="upload_progress_view_uploading_test" format="string"/>
+    </declare-styleable>
+</resources>

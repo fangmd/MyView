@@ -10,6 +10,14 @@
 
 进度条的 android:progressDrawable="@drawable/circle_progress_bar"属性
 
+### UploadProgressView
+
+图片上传进度控件
+
+![UploadProgressView](https://raw.githubusercontent.com/fangmd/markdownphoto/master/src/customViews/uploadprogressview.gif)
+
+
+
 ## DViewPager
 
 功能：自动轮播，指示器，标题

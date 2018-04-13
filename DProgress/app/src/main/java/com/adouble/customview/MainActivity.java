@@ -24,4 +24,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void toUploadProgressView(View view) {
+        UploadProgressViewActivity.start(this);
+    }
 }
