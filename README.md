@@ -14,6 +14,8 @@
 
 图片上传进度控件
 
+关键点：文字居中绘制
+
 ![UploadProgressView](https://raw.githubusercontent.com/fangmd/markdownphoto/master/src/customViews/uploadprogressview.gif)
 
 
